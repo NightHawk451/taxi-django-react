@@ -1,24 +1,22 @@
 // client/src/components/LogIn.js
 
-import React, { useState } from 'react'; // changed
+import React from 'react'; // changed
 import { Formik } from 'formik';
 import {
   Breadcrumb, Button, Card, Col, Form, Row
 } from 'react-bootstrap';
-import { Link, Redirect } from 'react-router-dom'; // changed
+import { Link } from 'react-router-dom'; // changed
 
-// changed
 function LogIn (props) {
-  // new
-  const [isSubmitted, setSubmitted] = useState(false);
-
-  // new
-  const onSubmit = (values, actions) => setSubmitted(true);
-
-  // new
-  if (isSubmitted) {
-    return <Redirect to='/' />;
-  }
+  // changed
+  const onSubmit = async (values, actions) => {
+    try {
+      await props.logIn(values.username, values.password);
+    }
+    catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <Row>
@@ -36,12 +34,11 @@ function LogIn (props) {
                 password: ''
               }}
               onSubmit={onSubmit}
-              >
-                {({
-                  handleChange,
-                  handleSubmit,
-                  values
-                }) => (
+              render={({
+                handleChange,
+                handleSubmit,
+                values
+              }) => (
                   <Form noValidate onSubmit={handleSubmit}>
                     <Form.Group controlId='username'>
                       <Form.Label>Username:</Form.Label>
@@ -63,15 +60,15 @@ function LogIn (props) {
                     <Button block type='submit' variant='primary'>Log in</Button>
                   </Form>
                 )}
-            </Formik>
-          </Card.Body>
-          <p className='mt-3 text-center'>
-            Don't have an account? <Link to='/sign-up'>Sign up!</Link>
-          </p>
-        </Card>
-      </Col>
-    </Row>
-  );
-}
-
-export default LogIn;
+                />
+              </Card.Body>
+              <p className='mt-3 text-center'>
+                Don't have an account? <Link to='/sign-up'>Sign up!</Link>
+              </p>
+            </Card>
+          </Col>
+        </Row>
+      );
+    }
+    
+    export default LogIn;

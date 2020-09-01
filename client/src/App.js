@@ -1,25 +1,53 @@
 // client/src/App.js
 
-import React from 'react';
-import { Container, Navbar } from 'react-bootstrap'; // new
-import { LinkContainer } from 'react-router-bootstrap'; // new
-import { Link, Route, Switch } from 'react-router-dom';
+import React, { useState } from 'react'; // changed
+import {
+  Button, Container, Form, Navbar
+} from 'react-bootstrap'; // changed
+import { LinkContainer } from 'react-router-bootstrap';
+import { Link, Redirect, Route, Switch } from 'react-router-dom';
+import axios from 'axios';
 
 import SignUp from './components/SignUp';
 import LogIn from './components/LogIn';
 
 import './App.css';
 
-// changed
 function App () {
+
+  const [isLoggedIn, setLoggedIn] = useState(() => { // changed
+    return window.localStorage.getItem('taxi.auth') !== null;
+  });
+
+  const logIn = async (username, password) => { // changed
+    const url = '/api/log_in/';
+    try {
+      const response = await axios.post(url, { username, password });
+      window.localStorage.setItem(
+        'taxi.auth', JSON.stringify(response.data)
+      );
+      setLoggedIn(true);
+    }
+    catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
-    <>
+    <div>
       <Navbar bg='light' expand='lg' variant='light'>
         <LinkContainer to='/'>
           <Navbar.Brand className='logo'>Taxi</Navbar.Brand>
         </LinkContainer>
         <Navbar.Toggle />
-        <Navbar.Collapse></Navbar.Collapse>
+        <Navbar.Collapse>
+          {
+            isLoggedIn &&
+            <Form inline className='ml-auto'>
+              <Button type='button'>Log out</Button>
+            </Form>
+          }
+        </Navbar.Collapse>
       </Navbar>
       <Container className='pt-3'>
         <Switch>
@@ -30,11 +58,23 @@ function App () {
               <Link className='btn btn-primary' to='/log-in'>Log in</Link>
             </div>
           )} />
-          <Route path='/sign-up' component={SignUp} />
-          <Route path='/log-in' component={LogIn} />
+          <Route path='/sign-up' render={() => (
+            isLoggedIn ? (
+              <Redirect to='/' />
+            ) : (
+              <SignUp />
+            )
+          )} />
+          <Route path='/log-in' render={() => (
+            isLoggedIn ? (
+              <Redirect to='/' />
+            ) : (
+              <LogIn logIn={logIn} />
+            )
+          )} />
         </Switch>
       </Container>
-    </>
+    </div>
   );
 }
 
