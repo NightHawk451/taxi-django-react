@@ -3,20 +3,29 @@
 import React from 'react'; // changed
 import { Formik } from 'formik';
 import {
-  Breadcrumb, Button, Card, Col, Form, Row
+  Alert, Breadcrumb, Button, Card, Col, Form, Row // changed
 } from 'react-bootstrap';
 import { Link } from 'react-router-dom'; // changed
 
-function LogIn (props) {
+function LogIn ({ logIn }) {
   // changed
   const onSubmit = async (values, actions) => {
     try {
-      await props.logIn(values.username, values.password);
+      const { response, isError } = await logIn(
+        values.username,
+        values.password
+      );
+      if (isError) {
+        const data = response.response.data;
+        for (const value in data) {
+          actions.setFieldError(value, data[value].join(' '));
+        }
+      }
     }
     catch (error) {
       console.error(error);
     }
-  };
+  }
 
   return (
     <Row>
@@ -28,18 +37,28 @@ function LogIn (props) {
         <Card>
           <Card.Header>Log in</Card.Header>
           <Card.Body>
-            <Formik
-              initialValues={{
-                username: '',
-                password: ''
-              }}
-              onSubmit={onSubmit}
-              render={({
-                handleChange,
-                handleSubmit,
-                values
-              }) => (
-                  <Form noValidate onSubmit={handleSubmit}>
+          <Formik
+            initialValues={{
+              username: '',
+              password: ''
+            }}
+            onSubmit={onSubmit}
+          >
+            {({
+              errors, // new
+              handleChange,
+              handleSubmit,
+              isSubmitting, // new
+              values
+            }) => (
+              <>
+                {
+                  '__all__' in errors &&
+                  <Alert variant='danger'>
+                    { errors['__all__'] }
+                  </Alert>
+                }
+                <Form noValidate onSubmit={handleSubmit}>
                     <Form.Group controlId='username'>
                       <Form.Label>Username:</Form.Label>
                       <Form.Control
@@ -57,10 +76,16 @@ function LogIn (props) {
                         value={values.password}
                       />
                     </Form.Group>
-                    <Button block type='submit' variant='primary'>Log in</Button>
-                  </Form>
-                )}
-                />
+                  <Button
+                    block
+                    disabled={isSubmitting}
+                    type='submit'
+                    variant='primary'
+                  >Log in</Button>
+                </Form>
+              </>
+            )}
+          </Formik>
               </Card.Body>
               <p className='mt-3 text-center'>
                 Don't have an account? <Link to='/sign-up'>Sign up!</Link>
