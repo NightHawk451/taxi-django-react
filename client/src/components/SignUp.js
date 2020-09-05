@@ -14,7 +14,7 @@ function SignUp (props) {
 
   // new
   const onSubmit = async (values, actions) => {
-    const url = '/api/sign_up/';
+    const url = `${process.env.REACT_APP_BASE_URL}/api/sign_up/`;
     const formData = new FormData();
     formData.append('username', values.username);
     formData.append('first_name', values.firstName);

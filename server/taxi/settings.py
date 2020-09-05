@@ -38,14 +38,16 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.postgres', # new
+    'django.contrib.postgres',
     'django.contrib.staticfiles',
-    'channels', # new
-    'rest_framework', # new
-    'trips', # new
+    'corsheaders',  # new
+    'channels',
+    'rest_framework',
+    'trips',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  # new
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -165,3 +167,7 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=1),
     'USER_ID_CLAIM': 'id',
 }
+
+CORS_ORIGIN_WHITELIST = [
+    "http://localhost:3001",
+]
