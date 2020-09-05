@@ -27,7 +27,7 @@ function App () {
         'taxi.auth', JSON.stringify(response.data)
       );
       setLoggedIn(true);
-      // new
+      // newS
       return { response, isError: false };
     }
     catch (error) {
