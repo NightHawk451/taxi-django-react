@@ -2,12 +2,13 @@
 
 import React, { useState } from 'react'; // changed
 import {
-  Button, Container, Form, Navbar
+  Button, Container, Form, Nav, Navbar
 } from 'react-bootstrap'; // changed
 import { LinkContainer } from 'react-router-bootstrap';
 import { Link, Redirect, Route, Switch } from 'react-router-dom';
 import axios from 'axios';
 
+import { isDriver, isRider } from './services/AuthService'; // new
 import Driver from './components/Driver.js';
 import LogIn from './components/LogIn';
 import Rider from './components/Rider.js';
@@ -64,26 +65,42 @@ function App () {
       <Container className='pt-3'>
         <Switch>
         <Route exact path='/' render={() => (
-            <div className='middle-center'>
-              <h1 className='landing logo'>Taxi</h1>
-              {
-                !isLoggedIn &&
+          <div className='middle-center'>
+            <h1 className='landing logo'>Taxi</h1>
+            {
+              !isLoggedIn && (
+                <>
+                  <Link
+                    id='signUp'
+                    className='btn btn-primary'
+                    to='/sign-up'
+                  >Sign up</Link>
+                  <Link
+                    id='logIn'
+                    className='btn btn-primary'
+                    to='/log-in'
+                  >Log in</Link>
+                </>
+              )
+            }
+            {
+              isRider() && (
                 <Link
-                  id='signUp'
                   className='btn btn-primary'
-                  to='/sign-up'
-                >Sign up</Link>
-              }
-              {
-                !isLoggedIn &&
+                  to='/rider'
+                >Dashboard</Link>
+              )
+            }
+            {
+              isDriver() && (
                 <Link
-                  id='logIn'
                   className='btn btn-primary'
-                  to='/log-in'
-                >Log in</Link>
-              }
-            </div>
-          )} />
+                  to='/driver'
+                >Dashboard</Link>
+              )
+            }
+          </div>
+        )} />
           <Route path='/sign-up' render={() => (
             isLoggedIn ? (
               <Redirect to='/' />

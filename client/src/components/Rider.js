@@ -1,12 +1,45 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react'; // changed
 import {
   Breadcrumb, Card, Col, Row
 } from 'react-bootstrap';
-import { Redirect } from 'react-router-dom'; // new
+import { Redirect } from 'react-router-dom';
 
-import { isRider } from '../services/AuthService'; // new
+import TripCard from './TripCard'; // new
+import { isRider } from '../services/AuthService';
+import { getTrips } from '../services/TripService'; // new
+
 
 function Rider (props) {
+  const [trips, setTrips] = useState([]);
+  
+  const getCurrentTrips = () => {
+    return trips.filter(trip => {
+      return (
+        trip.driver !== null &&
+        trip.status !== 'REQUESTED' &&
+        trip.status !== 'COMPLETED'
+      );
+    });
+  };
+  
+  const getCompletedTrips = () => {
+    return trips.filter(trip => {
+      return trip.status === 'COMPLETED';
+    });
+  };
+
+  // new
+  useEffect(() => {
+    const loadTrips = async () => {
+      const { response, isError } = await getTrips();
+      if (isError) {
+        setTrips([]);
+      } else {
+        setTrips(response.data);
+      }
+    }
+    loadTrips();
+  }, []);
 
     
   if (!isRider()) {
@@ -20,18 +53,18 @@ function Rider (props) {
           <Breadcrumb.Item href='/'>Home</Breadcrumb.Item>
           <Breadcrumb.Item active>Dashboard</Breadcrumb.Item>
         </Breadcrumb>
-        <Card className='mb-3'>
-          <Card.Header>Current Trip</Card.Header>
-          <Card.Body>
-            No trips.
-          </Card.Body>
-        </Card>
-        <Card className='mb-3'>
-          <Card.Header>Recent Trips</Card.Header>
-          <Card.Body>
-            No trips.
-          </Card.Body>
-        </Card>
+      <TripCard
+        title='Current Trip'
+        trips={getCurrentTrips()}
+        group='rider'
+        otherGroup='driver'
+      />
+      <TripCard
+        title='Recent Trips'
+        trips={getCompletedTrips()}
+        group='rider'
+        otherGroup='driver'
+      />
       </Col>
     </Row>
   );
