@@ -8,8 +8,10 @@ import { LinkContainer } from 'react-router-bootstrap';
 import { Link, Redirect, Route, Switch } from 'react-router-dom';
 import axios from 'axios';
 
-import SignUp from './components/SignUp';
+import Driver from './components/Driver.js';
 import LogIn from './components/LogIn';
+import Rider from './components/Rider.js';
+import SignUp from './components/SignUp';
 
 import './App.css';
 
@@ -95,6 +97,12 @@ function App () {
             ) : (
               <LogIn logIn={logIn} />
             )
+          )} />
+          <Route path='/driver' render={() => (
+            <Driver />
+          )} />
+          <Route path='/rider' render={() => (
+            <Rider />
           )} />
         </Switch>
       </Container>
