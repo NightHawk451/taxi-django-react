@@ -5,6 +5,8 @@ import {
 
 import TripCard from './TripCard';
 import { getTrips } from '../services/TripService';
+import { webSocket } from 'rxjs/webSocket';
+import { getAccessToken } from '../services/AuthService';
 
 function DriverDashboard (props) {
   const [trips, setTrips] = useState([]);
@@ -19,6 +21,20 @@ function DriverDashboard (props) {
       }
     }
     loadTrips();
+  }, []);
+
+  useEffect(() => {
+    const token = getAccessToken();
+    const ws = webSocket(`ws://localhost:8003/taxi/?token=${token}`);
+    const subscription = ws.subscribe((message) => {
+      setTrips(prevTrips => [
+        ...prevTrips.filter(trip => trip.id !== message.data.id),
+        message.data
+      ]);
+    });
+    return () => {
+      subscription.unsubscribe();
+    }
   }, []);
 
   const getCurrentTrips = () => {
